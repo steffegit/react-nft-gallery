@@ -13,7 +13,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { styled } from "@mui/system";
+import { useTheme } from "@mui/material";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +34,8 @@ export default function App() {
 
 const StyledImage = styled("img")({
   borderRadius: 4,
-  maxWidth: 350,
+  width: 350,
+  height: 350,
 });
 
 function Gallery() {
@@ -46,6 +49,8 @@ function Gallery() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const theme = useTheme();
+  const fullscreen = useMediaQuery(theme.breakpoints.down("md"));
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -56,20 +61,21 @@ function Gallery() {
       <Typography variant="h2" gutterBottom align="center" fontWeight={500}>
         OpenSea Gallery
       </Typography>
+
       <Grid
         container
         spacing={{ xs: 1, md: 1 }}
         columns={{ xs: 2, sm: 4, md: 10 }}
-        justifyContent="center"
-        alignItems="center"
+        justifyContent={"center"}
       >
         {data?.assets.map((_, index) => (
           <Grid item key={index}>
-            <div onClick={handleOpen}>
+            <div onClick={handleOpen} className="grid-div">
               <Link>
-                <StyledImage
+                <img
                   onClick={() => setNftIdx(index)}
                   src={data?.assets[index]?.image_url}
+                  width={350}
                 />
               </Link>
             </div>
@@ -77,7 +83,13 @@ function Gallery() {
         ))}
       </Grid>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth={"md"}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullWidth={true}
+        maxWidth={"md"}
+        fullScreen={fullscreen}
+      >
         <DialogTitle>
           <Container
             sx={{
@@ -96,10 +108,7 @@ function Gallery() {
         <DialogContent>
           <Typography component="div" gutterBottom align={"center"}>
             <Link href={data?.assets[nftIdx].permalink} target={"_blank"}>
-              <StyledImage
-                src={data?.assets[nftIdx].image_url}
-                height={"250vh"}
-              />
+              <StyledImage src={data?.assets[nftIdx].image_url} />
             </Link>
             <Grid
               container
