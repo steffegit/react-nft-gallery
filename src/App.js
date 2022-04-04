@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
@@ -9,7 +10,10 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, IconButton } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { styled } from "@mui/system";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +24,16 @@ export default function App() {
     </QueryClientProvider>
   );
 }
+
+//TODO: Make EVERYTHING responsive (still needs to be done)
+//TODO: Add Transitions (after everything is responsive)
+
+//TODO: Maybe Implement Size-Slider for picture image (OPTIONAL)
+
+const StyledImage = styled("img")({
+  borderRadius: 4,
+  maxWidth: 350,
+});
 
 function Gallery() {
   useEffect(() => {
@@ -38,19 +52,24 @@ function Gallery() {
   if (error) return <p>{error.message}</p>;
 
   return (
-    <Container>
+    <Box sx={{ flexGrow: 1, marginTop: 2 }}>
       <Typography variant="h2" gutterBottom align="center" fontWeight={500}>
         OpenSea Gallery
       </Typography>
-      <Grid container spacing={1} justifyContent="center" alignItems="center">
+      <Grid
+        container
+        spacing={{ xs: 1, md: 1 }}
+        columns={{ xs: 2, sm: 4, md: 10 }}
+        justifyContent="center"
+        alignItems="center"
+      >
         {data?.assets.map((_, index) => (
           <Grid item key={index}>
             <div onClick={handleOpen}>
               <Link>
-                <img
+                <StyledImage
                   onClick={() => setNftIdx(index)}
                   src={data?.assets[index]?.image_url}
-                  width={"400px"}
                 />
               </Link>
             </div>
@@ -58,33 +77,68 @@ function Gallery() {
         ))}
       </Grid>
 
-      <Dialog open={open} onClose={handleClose} fullWidth>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth={"md"}>
         <DialogTitle>
           <Container
             sx={{
               display: "flex",
+              alignItems: "center",
             }}
           >
             <Typography variant="h6" flexGrow={1}>
               {data?.assets[nftIdx].name}
             </Typography>
-            <IconButton edge="end" onClick={handleClose}>
+            <IconButton onClick={handleClose}>
               <CloseIcon />
             </IconButton>
           </Container>
         </DialogTitle>
         <DialogContent>
-          <Container>
+          <Typography component="div" gutterBottom align={"center"}>
             <Link href={data?.assets[nftIdx].permalink} target={"_blank"}>
-              <img src={data?.assets[nftIdx].image_url} />
+              <StyledImage
+                src={data?.assets[nftIdx].image_url}
+                height={"250vh"}
+              />
             </Link>
+            <Grid
+              container
+              display="flex"
+              justifyContent="space-between"
+              fullWidth
+              columns={4}
+            >
+              <Grid item xs={2}>
+                <IconButton
+                  onClick={() => {
+                    if (nftIdx > 0) setNftIdx(nftIdx - 1);
+                  }}
+                  edge="start"
+                >
+                  <KeyboardArrowLeftIcon />
+                </IconButton>
+              </Grid>
+
+              <Grid item xs={2}>
+                <IconButton
+                  edge="end"
+                  onClick={() => {
+                    if (nftIdx < 19) setNftIdx(nftIdx + 1);
+                  }}
+                >
+                  <KeyboardArrowRightIcon />
+                </IconButton>
+              </Grid>
+            </Grid>
+
             {data?.assets[nftIdx]?.last_sale?.total_price ? (
               <Typography
                 component="div"
-                variant="h5"
+                variant="h6"
                 gutterBottom
                 justifyContent={"center"}
                 align={"center"}
+                alignItems={"center"}
               >
                 Last Sold Price:{" "}
                 {(
@@ -95,7 +149,7 @@ function Gallery() {
             ) : (
               <Typography
                 component="div"
-                variant="h5"
+                variant="h6"
                 gutterBottom
                 justifyContent={"center"}
                 align={"center"}
@@ -103,10 +157,10 @@ function Gallery() {
                 Never Sold
               </Typography>
             )}
-          </Container>
+          </Typography>
         </DialogContent>
       </Dialog>
-    </Container>
+    </Box>
   );
 }
 
