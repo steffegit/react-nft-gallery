@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useEffect } from "react";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
-function App() {
+const queryClient = new QueryClient();
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <Gallery />
+    </QueryClientProvider>
   );
 }
 
-export default App;
+function Gallery() {
+  useEffect(() => {
+    fetchAPI();
+  }, []);
+  const { isLoading, data, error } = useQuery("fetchedData", fetchAPI);
+
+  if (isLoading) return <p>Loading...</p>;
+
+  if (error) return <p>{error.message}</p>;
+
+  return (
+    <div>
+      {data?.assets.map((_, index) => (
+        <img src={data?.assets[index]?.image_url} />
+      ))}
+    </div>
+  );
+
+  // <img src={data?.assets[0].image_url} />;
+}
+
+async function fetchAPI() {
+  const { data } = await axios.get(
+    "https://api.opensea.io/api/v1/assets?collection_slug=boredapeyachtclub"
+  );
+  console.log(data);
+  return data;
+}
