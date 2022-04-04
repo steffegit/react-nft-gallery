@@ -1,9 +1,10 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,10 @@ function Gallery() {
   useEffect(() => {
     fetchAPI();
   }, []);
+
   const { isLoading, data, error } = useQuery("fetchedData", fetchAPI);
+
+  const [nftIdx, setNftIdx] = useState(0);
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -27,25 +31,29 @@ function Gallery() {
 
   return (
     <Container>
-      <Typography variant="h2" gutterBottom align="center">
+      <Typography variant="h2" gutterBottom align="center" fontWeight={500}>
         OpenSea Gallery
       </Typography>
       <Grid container spacing={1} justifyContent="center" alignItems="center">
         {data?.assets.map((_, index) => (
           <Grid item key={index}>
-            <img src={data?.assets[index]?.image_url} width={"400px"} />
+            <Link href={data?.assets[nftIdx].permalink} target={"_blank"}>
+              <img
+                onClick={() => setNftIdx(index)}
+                src={data?.assets[index]?.image_url}
+                width={"400px"}
+              />
+            </Link>
           </Grid>
         ))}
       </Grid>
     </Container>
   );
-
-  // <img src={data?.assets[0].image_url} />;
 }
 
 async function fetchAPI() {
   const { data } = await axios.get(
-    "https://api.opensea.io/api/v1/assets?collection_slug=boredapeyachtclub"
+    "https://api.opensea.io/api/v1/assets?collection_slug=hapeprime"
   );
   console.log(data);
   return data;
