@@ -34,8 +34,8 @@ export default function App() {
 
 const StyledImage = styled("img")({
   borderRadius: 4,
-  width: 350,
-  height: 350,
+  width: 300,
+  height: 300,
 });
 
 function Gallery() {
@@ -75,6 +75,7 @@ function Gallery() {
                 <img
                   onClick={() => setNftIdx(index)}
                   src={data?.assets[index]?.image_url}
+                  alt={`${index}_image`}
                   width={350}
                 />
               </Link>
